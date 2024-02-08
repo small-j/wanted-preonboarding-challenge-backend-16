@@ -33,7 +33,6 @@ public class PerformanceTests {
     @Test
     public void performanceSave() {
         // given
-        LocalDateTime now = LocalDateTime.now();
         Performance performance = Performance.builder()
                 .name("레베카")
                 .price(100000)
