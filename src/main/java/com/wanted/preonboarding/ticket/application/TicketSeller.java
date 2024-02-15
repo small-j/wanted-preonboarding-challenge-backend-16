@@ -28,8 +28,9 @@ public class TicketSeller {
             .toList();
     }
 
-    public PerformanceInfo getPerformanceInfoDetail(String name) {
-        return PerformanceInfo.of(performanceRepository.findByName(name));
+    public PerformanceInfo getPerformanceInfoDetail(String id) {
+        return PerformanceInfo.of(performanceRepository.findById(UUID.fromString(id))
+                .orElseThrow(EntityNotFoundException::new));
     }
 
     public boolean reserve(ReserveInfo reserveInfo) {
