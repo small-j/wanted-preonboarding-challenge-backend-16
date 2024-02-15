@@ -20,9 +20,11 @@ public class TicketSeller {
     private final PerformanceRepository performanceRepository;
     private final ReservationRepository reservationRepository;
     private long totalAmount = 0L;
+    private String isEnable = "enable";
+    private String isDisable = "disable";
 
     public List<PerformanceInfo> getAllPerformanceInfoList() {
-        return performanceRepository.findByIsReserve("enable")
+        return performanceRepository.findByIsReserve(isEnable)
             .stream()
             .map(PerformanceInfo::of)
             .toList();
@@ -38,7 +40,7 @@ public class TicketSeller {
         Performance info = performanceRepository.findById(reserveInfo.getPerformanceId())
             .orElseThrow(EntityNotFoundException::new);
         String enableReserve = info.getIsReserve();
-        if (enableReserve.equalsIgnoreCase("enable")) {
+        if (enableReserve.equalsIgnoreCase(isEnable)) {
             // 1. 결제
             int price = info.getPrice();
             reserveInfo.setAmount(reserveInfo.getAmount() - price);
