@@ -1,6 +1,7 @@
 package com.wanted.preonboarding.ticket.application;
 
 import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
+import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
 import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
@@ -41,7 +42,7 @@ public class TicketSeller {
     }
 
     @Transactional
-    public boolean reserve(ReserveInfo reserveInfo) {
+    public ReservationResult reserve(ReserveInfo reserveInfo) {
         Performance performance = performanceRepository.findById(reserveInfo.getPerformanceId())
                 .orElseThrow(EntityNotFoundException::new);
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reserveInfo.getRound(), reserveInfo.getLine(), reserveInfo.getSeat());
@@ -53,12 +54,7 @@ public class TicketSeller {
         reservationRepository.save(Reservation.of(reserveInfo));
         performanceSeatInfo.setIsReserve(isDisable);
 
-            // smallj : 반환 정보 변경 필요.
-            return true;
-
-        } else {
-            return false;
-        }
+        return ReservationResult.of(performance, performanceSeatInfo, reserveInfo.getReservationName(), reserveInfo.getReservationPhoneNumber());
     }
     private void isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {
         String result = performance.getIsReserve().equalsIgnoreCase(isEnable)

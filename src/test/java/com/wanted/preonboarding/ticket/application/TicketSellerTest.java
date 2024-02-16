@@ -1,6 +1,7 @@
 package com.wanted.preonboarding.ticket.application;
 
 import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
+import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
 import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
@@ -114,7 +115,7 @@ public class TicketSellerTest {
         performanceSeatInfoRepository.save(performanceSeatInfo3);
 
         // when
-        boolean result = ticketSeller.reserve(ReserveInfo.builder()
+        ReservationResult result = ticketSeller.reserve(ReserveInfo.builder()
                 .performanceId(performance.getId())
                 .reservationName("유진호")
                 .reservationPhoneNumber("010-1234-1234")
@@ -127,6 +128,6 @@ public class TicketSellerTest {
         );
 
         // then
-        Assertions.assertThat(result).isTrue();
+        Assertions.assertThat(result).isNotNull();
     }
 }
