@@ -34,5 +34,4 @@ public class Performance {
     private LocalDateTime startDate;
     @Column(nullable = false, name = "is_reserve", columnDefinition = "varchar default 'disable'")
     private String isReserve;
-
 }
