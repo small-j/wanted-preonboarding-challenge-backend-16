@@ -1,17 +1,22 @@
 package com.wanted.preonboarding.ticket.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 
 @Getter
 @Builder
 @Entity
+@Table(name = "performance_seat_info")
+@NoArgsConstructor
+@AllArgsConstructor
 public class PerformanceSeatInfo {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
