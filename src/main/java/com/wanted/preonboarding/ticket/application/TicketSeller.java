@@ -25,8 +25,8 @@ public class TicketSeller {
     private final PerformanceSeatInfoRepository performanceSeatInfoRepository;
     private final ReservationRepository reservationRepository;
 
-    private String isEnable = "enable";
-    private String isDisable = "disable";
+    private final String isEnable = "enable";
+    private final String isDisable = "disable";
 
     public List<PerformanceInfo> getAllPerformanceInfoList() {
         return performanceRepository.findByIsReserve(isEnable)
