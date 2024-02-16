@@ -1,8 +1,11 @@
 package com.wanted.preonboarding.ticket.application;
 
 import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
+import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
+import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
+import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceSeatInfoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +22,8 @@ import java.util.UUID;
 public class TicketSellerTest {
     @Autowired
     private PerformanceRepository performanceRepository;
+    @Autowired
+    private PerformanceSeatInfoRepository performanceSeatInfoRepository;
 
     @Autowired
     private TicketSeller ticketSeller;
@@ -66,4 +71,62 @@ public class TicketSellerTest {
         Assertions.assertThat(performanceIdList).isNotIn(savedPerformance3.getId());
     }
 
+    @Test
+    public void reserve() {
+        // given
+        Performance performance = Performance.builder()
+                .name("레베카")
+                .price(10000)
+                .round(1)
+                .type(0)
+                .isReserve("enable")
+                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
+                .build();
+        Performance savedPerformance = performanceRepository.save(performance);
+        PerformanceSeatInfo performanceSeatInfo1 = PerformanceSeatInfo.builder()
+                .performance(performance)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(1)
+                .isReserve("enable")
+                .build();
+
+        PerformanceSeatInfo performanceSeatInfo2 = PerformanceSeatInfo.builder()
+                .performance(performance)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(2)
+                .isReserve("enable")
+                .build();
+
+        PerformanceSeatInfo performanceSeatInfo3 = PerformanceSeatInfo.builder()
+                .performance(performance)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(3)
+                .isReserve("enable")
+                .build();
+        performanceSeatInfoRepository.save(performanceSeatInfo1);
+        performanceSeatInfoRepository.save(performanceSeatInfo2);
+        performanceSeatInfoRepository.save(performanceSeatInfo3);
+
+        // when
+        boolean result = ticketSeller.reserve(ReserveInfo.builder()
+                .performanceId(performance.getId())
+                .reservationName("유진호")
+                .reservationPhoneNumber("010-1234-1234")
+                .reservationStatus("reserve")
+                .amount(200000)
+                .round(1)
+                .line('A')
+                .seat(1)
+                .build()
+        );
+
+        // then
+        Assertions.assertThat(result).isTrue();
+    }
 }
