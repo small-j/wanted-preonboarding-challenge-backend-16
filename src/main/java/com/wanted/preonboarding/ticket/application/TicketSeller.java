@@ -46,13 +46,12 @@ public class TicketSeller {
                 .orElseThrow(EntityNotFoundException::new);
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reserveInfo.getRound(), reserveInfo.getLine(), reserveInfo.getSeat());
 
-        if (isEnabled(performance, performanceSeatInfo)) {
-            // 1. 결제
-            pay(reserveInfo, getPrice(performance.getPrice()));
+        isEnabled(performance, performanceSeatInfo);
 
-            // 2. 예매 진행
-            reservationRepository.save(Reservation.of(reserveInfo));
-            performanceSeatInfo.setIsReserve(isDisable);
+        pay(reserveInfo, getPrice(performance.getPrice()));
+
+        reservationRepository.save(Reservation.of(reserveInfo));
+        performanceSeatInfo.setIsReserve(isDisable);
 
             // smallj : 반환 정보 변경 필요.
             return true;
@@ -61,10 +60,13 @@ public class TicketSeller {
             return false;
         }
     }
-    private boolean isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {
+    private void isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {
         String result = performance.getIsReserve().equalsIgnoreCase(isEnable)
                 && performanceSeatInfo.getIsReserve().equalsIgnoreCase(isEnable) ? isEnable : isDisable;
-        return result.equalsIgnoreCase(isEnable);
+
+        String disableReservationMessage = "예약할 수 없는 공연(공연좌석) 입니다.";
+        if (result.equalsIgnoreCase(isDisable))
+            throw new IllegalArgumentException(disableReservationMessage);
     }
 
     private int getPrice(int price) {
