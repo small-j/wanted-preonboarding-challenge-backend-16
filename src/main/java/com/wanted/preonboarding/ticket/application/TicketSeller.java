@@ -51,8 +51,8 @@ public class TicketSeller {
             pay(reserveInfo, getPrice(performance.getPrice()));
 
             // 2. 예매 진행
-            // smallj : 공연 좌석 isReserve 정보 변경.
             reservationRepository.save(Reservation.of(reserveInfo));
+            performanceSeatInfo.setIsReserve(isDisable);
 
             // smallj : 반환 정보 변경 필요.
             return true;
