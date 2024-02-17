@@ -4,6 +4,7 @@ import com.wanted.preonboarding.ticket.discountPolicy.DiscountPolicy;
 import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
 import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
 import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
+import com.wanted.preonboarding.ticket.domain.dto.UserInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Reservation;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +60,32 @@ public class TicketSeller {
 
         return ReservationResult.of(performance, performanceSeatInfo, reserveInfo.getReservationName(), reserveInfo.getReservationPhoneNumber());
     }
+
+    public List<ReservationResult> findReservationHistory(UserInfo userInfo) {
+        List<Reservation> reservations = reservationRepository.findByNameAndPhoneNumber(userInfo.getName(), userInfo.getPhoneNumber());
+
+        List<UUID> performanceIds = reservations.stream().map(reservation -> reservation.getPerformanceId()).toList();
+        List<Performance> performances = performanceRepository.findDistinctByIdIn(performanceIds);
+
+        System.out.println(performances.size());
+        List<ReservationResult> result = new ArrayList<>();
+        for (Performance performance: performances) {
+            List<Reservation> temp = reservations
+                    .stream()
+                    .filter(reservation ->
+                    {
+                        System.out.println(reservation.getPerformanceId());
+                        System.out.println(performance.getId());
+                        return reservation.getPerformanceId().toString().equals(performance.getId().toString());
+                    })
+                    .toList();
+            System.out.println(temp.size());
+                    temp.forEach(reservation -> result.add(ReservationResult.of(performance, reservation)));
+        }
+
+        return result;
+    }
+
     private void isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {
         String result = performance.getIsReserve().equalsIgnoreCase(isEnable)
                 && performanceSeatInfo.getIsReserve().equalsIgnoreCase(isEnable) ? isEnable : isDisable;

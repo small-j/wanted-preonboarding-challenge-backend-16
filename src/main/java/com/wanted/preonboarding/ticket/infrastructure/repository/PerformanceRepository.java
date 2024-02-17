@@ -8,5 +8,8 @@ import java.util.UUID;
 
 public interface PerformanceRepository extends JpaRepository<Performance, UUID> {
     List<Performance> findByIsReserve(String isReserve);
+
+    List<Performance> findDistinctByIdIn(List<UUID> ids);
+
     Performance findByName(String name);
 }

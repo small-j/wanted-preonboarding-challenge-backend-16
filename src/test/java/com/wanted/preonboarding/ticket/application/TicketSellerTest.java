@@ -3,6 +3,7 @@ package com.wanted.preonboarding.ticket.application;
 import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
 import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
 import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
+import com.wanted.preonboarding.ticket.domain.dto.UserInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
@@ -129,5 +130,77 @@ public class TicketSellerTest {
 
         // then
         Assertions.assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void findReservationHistory() {
+        // smallj : 깨지기 쉬운 test. 매번 데이터 베이스 데이터를 초기화 해 주어야 한다.
+        // given
+        Performance performance1 = Performance.builder()
+                .name("레베카")
+                .price(10000)
+                .round(1)
+                .type(0)
+                .isReserve("enable")
+                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
+                .build();
+        performanceRepository.save(performance1);
+        Performance performance2 = Performance.builder()
+                .name("캣츠")
+                .price(100000)
+                .round(1)
+                .type(0)
+                .isReserve("enable")
+                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
+                .build();
+        performanceRepository.save(performance2);
+
+        PerformanceSeatInfo performanceSeatInfo1 = PerformanceSeatInfo.builder()
+                .performance(performance1)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(1)
+                .isReserve("enable")
+                .build();
+        performanceSeatInfoRepository.save(performanceSeatInfo1);
+        PerformanceSeatInfo performanceSeatInfo2 = PerformanceSeatInfo.builder()
+                .performance(performance2)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(1)
+                .isReserve("enable")
+                .build();
+        performanceSeatInfoRepository.save(performanceSeatInfo2);
+
+        ReservationResult reservation1 = ticketSeller.reserve(ReserveInfo.builder()
+                .performanceId(performance1.getId())
+                .reservationName("유진호")
+                .reservationPhoneNumber("010-1234-1234")
+                .reservationStatus("reserve")
+                .amount(200000)
+                .round(1)
+                .line('A')
+                .seat(1)
+                .build()
+        );
+        ReservationResult reservation2 = ticketSeller.reserve(ReserveInfo.builder()
+                .performanceId(performance2.getId())
+                .reservationName("유진호")
+                .reservationPhoneNumber("010-1234-1234")
+                .reservationStatus("reserve")
+                .amount(200000)
+                .round(1)
+                .line('A')
+                .seat(1)
+                .build()
+        );
+
+        // when
+        List<ReservationResult> reservationResults = ticketSeller.findReservationHistory(new UserInfo("유진호", "010-1234-1234"));
+
+        // then
+        Assertions.assertThat(reservationResults.size()).isEqualTo(2);
     }
 }
