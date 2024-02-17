@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.ticket.application;
 
+import com.wanted.preonboarding.ticket.discountPolicy.DiscountPolicy;
 import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
 import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
 import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
@@ -25,6 +26,7 @@ public class TicketSeller {
     private final PerformanceRepository performanceRepository;
     private final PerformanceSeatInfoRepository performanceSeatInfoRepository;
     private final ReservationRepository reservationRepository;
+    private final DiscountPolicy discountPolicy;
 
     private final String isEnable = "enable";
     private final String isDisable = "disable";
@@ -49,7 +51,7 @@ public class TicketSeller {
 
         isEnabled(performance, performanceSeatInfo);
 
-        pay(reserveInfo, getPrice(performance.getPrice()));
+        pay(reserveInfo, getDiscountedPrice(performance.getPrice()));
 
         reservationRepository.save(Reservation.of(reserveInfo));
         performanceSeatInfo.setIsReserve(isDisable);
@@ -65,20 +67,19 @@ public class TicketSeller {
             throw new IllegalArgumentException(disableReservationMessage);
     }
 
-    private int getPrice(int price) {
-        // smallj : discount policy를 적용한 금액 반환.
-        return price;
+    private long getDiscountedPrice(long price) {
+        return discountPolicy.discount(price);
     }
 
-    private void pay(ReserveInfo reserveInfo, int price) {
+    private void pay(ReserveInfo reserveInfo, long price) {
         String amountNotEnoughMessage = "통장 잔고 부족으로 결제를 수행할 수 있는 상태가 아닙니다.";
         if (!isAmountEnough(reserveInfo.getAmount(), price))
             throw new IllegalStateException(amountNotEnoughMessage);
 
-        reserveInfo.setAmount(reserveInfo.getAmount() - (long) price);
+        reserveInfo.setAmount(reserveInfo.getAmount() - price);
     }
 
-    private boolean isAmountEnough(long amount, int price) {
-        return amount - (long) price >= 0; // smallj :  magic number 처리 필요
+    private boolean isAmountEnough(long amount, long price) {
+        return amount - price >= 0; // smallj :  magic number 처리 필요
     }
 }
