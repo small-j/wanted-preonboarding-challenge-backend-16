@@ -32,6 +32,6 @@ public class Performance {
     private int type;
     @Column(nullable = false)
     private LocalDateTime startDate;
-    @Column(nullable = false, name = "is_reserve", columnDefinition = "varchar default 'disable'")
+    @Column(nullable = false, name = "is_reserve", columnDefinition = "varchar default 'enable'")
     private String isReserve;
 }

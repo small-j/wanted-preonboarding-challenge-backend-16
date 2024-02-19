@@ -31,7 +31,7 @@ public class PerformanceSeatInfo {
     private char line;
     @Column(nullable = false)
     private int seat;
-    @Column(nullable = false, columnDefinition = "varchar default 'disable'")
+    @Column(nullable = false, columnDefinition = "varchar default 'enable'")
     private String isReserve;
 
     public void setIsReserve(String isReserve) {
