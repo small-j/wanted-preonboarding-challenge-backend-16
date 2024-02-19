@@ -6,8 +6,10 @@ import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
 import com.wanted.preonboarding.ticket.domain.dto.UserInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
+import com.wanted.preonboarding.ticket.domain.entity.Reservation;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceSeatInfoRepository;
+import com.wanted.preonboarding.ticket.infrastructure.repository.ReservationRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,8 @@ public class TicketSellerTest {
     private PerformanceRepository performanceRepository;
     @Autowired
     private PerformanceSeatInfoRepository performanceSeatInfoRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Autowired
     private TicketSeller ticketSeller;
@@ -134,7 +138,7 @@ public class TicketSellerTest {
 
     @Test
     public void findReservationHistory() {
-        // smallj : 깨지기 쉬운 test. 매번 데이터 베이스 데이터를 초기화 해 주어야 한다.
+        // smallj : 깨지기 쉬운 test. 매번 데이터 베이스 데이터를 초기화 해 줄 방법을 찾아보자.
         // given
         Performance performance1 = Performance.builder()
                 .name("레베카")
@@ -202,5 +206,48 @@ public class TicketSellerTest {
 
         // then
         Assertions.assertThat(reservationResults.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void cancelReservation() {
+        // given
+        Performance performance = Performance.builder()
+                .name("레베카")
+                .price(10000)
+                .round(1)
+                .type(0)
+                .isReserve("enable")
+                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
+                .build();
+        PerformanceSeatInfo performanceSeatInfo = PerformanceSeatInfo.builder()
+                .performance(performance)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(1)
+                .isReserve("enable")
+                .build();
+        performanceRepository.save(performance);
+        performanceSeatInfoRepository.save(performanceSeatInfo);
+
+        ReservationResult result = ticketSeller.reserve(ReserveInfo.builder()
+                .performanceId(performance.getId())
+                .reservationName("유진호")
+                .reservationPhoneNumber("010-1234-1234")
+                .reservationStatus("reserve")
+                .amount(200000)
+                .round(1)
+                .line('A')
+                .seat(1)
+                .build()
+        );
+
+        // when
+        ticketSeller.cancelReservation(result.getReservationId());
+
+        // then
+        Reservation reservation = reservationRepository.findById(result.getReservationId())
+                .orElseThrow(IllegalArgumentException::new);
+        Assertions.assertThat(reservation.getIsCanceled()).isEqualTo("enable");
     }
 }

@@ -41,4 +41,10 @@ public class ReserveController {
                         .build()
                 );
     }
+
+    @DeleteMapping("/cancel/{reservation_id}")
+    public ResponseEntity cancelReservation(@PathVariable int reservationId) {
+        ticketSeller.cancelReservation(reservationId);
+        return ResponseEntity.ok().build();
+    }
 }

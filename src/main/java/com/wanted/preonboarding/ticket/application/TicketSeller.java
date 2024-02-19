@@ -55,10 +55,10 @@ public class TicketSeller {
 
         pay(reserveInfo, getDiscountedPrice(performance.getPrice()));
 
-        reservationRepository.save(Reservation.of(reserveInfo));
+        Reservation reservation = reservationRepository.save(Reservation.of(reserveInfo));
         performanceSeatInfo.setIsReserve(isDisable);
 
-        return ReservationResult.of(performance, performanceSeatInfo, reserveInfo.getReservationName(), reserveInfo.getReservationPhoneNumber());
+        return ReservationResult.of(performance, reservation);
     }
 
     public List<ReservationResult> findReservationHistory(UserInfo userInfo) {
@@ -84,6 +84,20 @@ public class TicketSeller {
         }
 
         return result;
+    }
+
+    @Transactional
+    public void cancelReservation(int reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(IllegalArgumentException::new);
+        reservation.setIsCanceled(isEnable);
+
+        // smallj : 좌석 정보 업데이트 필요. -> 좌석 정보 업데이트를 위해 매번 공연을 조회해야하나?
+        Performance performance = performanceRepository.findById(reservation.getPerformanceId())
+                .orElseThrow(IllegalArgumentException::new);
+        PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reservation.getRound(), reservation.getLine(), reservation.getSeat());
+
+        performanceSeatInfo.setIsReserve(isEnable);
     }
 
     private void isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {
