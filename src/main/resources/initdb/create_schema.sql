@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `reservation`
     `gate`           INT                    NOT NULL COMMENT '입장 게이트',
     `line`           CHAR                   NOT NULL COMMENT '좌석 열',
     `seat`           INT                    NOT NULL COMMENT '좌석 행',
+    `is_canceled`    varchar(255)           NOT NULL default 'disable',
     `created_at`     DATETIME DEFAULT NOW() NOT NULL,
     `updated_at`     DATETIME DEFAULT NOW() NOT NUll,
     PRIMARY KEY (id),

@@ -34,6 +34,8 @@ public class Reservation {
     private int gate;
     private char line;
     private int seat;
+    @Column(nullable = false, columnDefinition = "varchar default 'disable'")
+    private String isCanceled;
 
     public static Reservation of(ReserveInfo info) {
         return Reservation.builder()
@@ -44,7 +46,11 @@ public class Reservation {
             .gate(1)
             .line(info.getLine())
             .seat(info.getSeat())
+            .isCanceled("disabled")
             .build();
     }
 
+    public void setIsCanceled(String isCanceled) {
+        this.isCanceled = isCanceled;
+    }
 }
