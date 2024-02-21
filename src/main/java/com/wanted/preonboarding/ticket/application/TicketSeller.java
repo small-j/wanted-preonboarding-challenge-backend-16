@@ -1,16 +1,15 @@
 package com.wanted.preonboarding.ticket.application;
 
 import com.wanted.preonboarding.ticket.discountPolicy.DiscountPolicy;
-import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
-import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
-import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
-import com.wanted.preonboarding.ticket.domain.dto.UserInfo;
+import com.wanted.preonboarding.ticket.domain.dto.*;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Reservation;
+import com.wanted.preonboarding.ticket.domain.entity.StandByUser;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceSeatInfoRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.ReservationRepository;
+import com.wanted.preonboarding.ticket.infrastructure.repository.StandByUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +27,7 @@ public class TicketSeller {
     private final PerformanceRepository performanceRepository;
     private final PerformanceSeatInfoRepository performanceSeatInfoRepository;
     private final ReservationRepository reservationRepository;
+    private final StandByUserRepository standByUserRepository;
     private final DiscountPolicy discountPolicy;
 
     private final String isEnable = "enable";
@@ -98,6 +98,15 @@ public class TicketSeller {
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reservation.getRound(), reservation.getLine(), reservation.getSeat());
 
         performanceSeatInfo.setIsReserve(isEnable);
+    }
+
+    @Transactional
+    public StandByUserInfo addStandByUser(StandByUserInfo standByUserInfo) {
+        Performance performance = performanceRepository.getReferenceById(standByUserInfo.getPerformanceId());
+        StandByUser standByUser = StandByUser.of(standByUserInfo, performance);
+        standByUserRepository.save(standByUser);
+        // smallj : 이미 신청한 공연 대기라면 예외 처리 구현 필요.
+        return StandByUserInfo.of(standByUser);
     }
 
     private void isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {

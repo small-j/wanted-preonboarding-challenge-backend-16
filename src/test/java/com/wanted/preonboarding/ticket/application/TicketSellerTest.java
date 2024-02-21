@@ -1,12 +1,10 @@
 package com.wanted.preonboarding.ticket.application;
 
-import com.wanted.preonboarding.ticket.domain.dto.PerformanceInfo;
-import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
-import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
-import com.wanted.preonboarding.ticket.domain.dto.UserInfo;
+import com.wanted.preonboarding.ticket.domain.dto.*;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Reservation;
+import com.wanted.preonboarding.ticket.domain.entity.StandByUser;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceSeatInfoRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.ReservationRepository;
@@ -249,5 +247,31 @@ public class TicketSellerTest {
         Reservation reservation = reservationRepository.findById(result.getReservationId())
                 .orElseThrow(IllegalArgumentException::new);
         Assertions.assertThat(reservation.getIsCanceled()).isEqualTo("enable");
+    }
+
+    @Test
+    void addStandByUser() {
+        // given
+        Performance performance = Performance.builder()
+                .name("레베카")
+                .price(10000)
+                .round(1)
+                .type(0)
+                .isReserve("enable")
+                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
+                .build();
+        performanceRepository.save(performance);
+        StandByUserInfo standByUserInfo = StandByUserInfo.builder()
+                .performanceId(performance.getId())
+                .name("김지윤")
+                .phoneNumber("010-1234-1234")
+                .email("wldbs2043@naver.com")
+                .build();
+
+        // when
+        StandByUserInfo result = ticketSeller.addStandByUser(standByUserInfo);
+
+        // then
+        Assertions.assertThat(result).isNotNull();
     }
 }
