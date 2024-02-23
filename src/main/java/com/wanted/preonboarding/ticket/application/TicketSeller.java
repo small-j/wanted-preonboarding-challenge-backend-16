@@ -67,19 +67,13 @@ public class TicketSeller {
         List<UUID> performanceIds = reservations.stream().map(reservation -> reservation.getPerformanceId()).toList();
         List<Performance> performances = performanceRepository.findDistinctByIdIn(performanceIds);
 
-        System.out.println(performances.size());
         List<ReservationResult> result = new ArrayList<>();
         for (Performance performance: performances) {
             List<Reservation> temp = reservations
                     .stream()
-                    .filter(reservation ->
-                    {
-                        System.out.println(reservation.getPerformanceId());
-                        System.out.println(performance.getId());
-                        return reservation.getPerformanceId().toString().equals(performance.getId().toString());
-                    })
+                    .filter(reservation -> reservation.getPerformanceId().toString().equals(performance.getId().toString()))
                     .toList();
-            System.out.println(temp.size());
+
                     temp.forEach(reservation -> result.add(ReservationResult.of(performance, reservation)));
         }
 
