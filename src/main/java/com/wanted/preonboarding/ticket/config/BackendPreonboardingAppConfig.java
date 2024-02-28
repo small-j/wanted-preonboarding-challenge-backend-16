@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.ticket.config;
 
+import com.wanted.preonboarding.ticket.application.EmailSender;
 import com.wanted.preonboarding.ticket.discountPolicy.DiscountPolicy;
 import com.wanted.preonboarding.ticket.discountPolicy.SpecialDiscountPolicy;
 import org.springframework.context.annotation.Bean;
