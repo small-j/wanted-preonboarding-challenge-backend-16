@@ -2,7 +2,7 @@ package com.wanted.preonboarding.ticket.application;
 
 import com.wanted.preonboarding.observer.IObserver;
 import com.wanted.preonboarding.observer.ISubject;
-import com.wanted.preonboarding.ticket.domain.dto.ReservationResult;
+import com.wanted.preonboarding.ticket.domain.entity.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class TicketCancelNotificationSubject implements ISubject<ReservationResult> {
+public class TicketCancelNotificationSubject implements ISubject<Reservation> {
     private final Set<IObserver> observers;
 
     @Override
@@ -24,9 +24,9 @@ public class TicketCancelNotificationSubject implements ISubject<ReservationResu
     }
 
     @Override
-    public boolean sendMessage(ReservationResult reservationResult) {
+    public boolean sendMessage(Reservation reservation) {
         observers.stream()
-                .forEach(observer -> observer.update(reservationResult));
+                .forEach(observer -> observer.update(reservation));
 
         // smallj : 무조건 true를 반환할게 아니라 forEach 구문 안에서 에러가 발생했을 때 어떻게 처리할지 고민해보기.
         return true;
