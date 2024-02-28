@@ -29,6 +29,7 @@ public class TicketSeller {
     private final ReservationRepository reservationRepository;
     private final StandByUserRepository standByUserRepository;
     private final DiscountPolicy discountPolicy;
+    private final EmailSender emailSender;
 
     private final String isEnable = "enable";
     private final String isDisable = "disable";
@@ -92,6 +93,8 @@ public class TicketSeller {
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reservation.getRound(), reservation.getLine(), reservation.getSeat());
 
         performanceSeatInfo.setIsReserve(isEnable);
+
+        sendEmailToStandByUser(reservation);
     }
 
     @Transactional
@@ -126,5 +129,16 @@ public class TicketSeller {
 
     private boolean isAmountEnough(long amount, long price) {
         return amount - price >= 0; // smallj :  magic number 처리 필요
+    }
+
+    private void sendEmailToStandByUser(Reservation reservation) {
+        Performance performance = performanceRepository.findById(reservation.getPerformanceId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        String title = "공연 예약 알림";
+        String msg = performance.getName() + " 공연이 예약 가능합니다.";
+        List<StandByUser> users = standByUserRepository.findByPerformanceId(reservation.getPerformanceId());
+        users.stream()
+                .forEach(standByUser -> emailSender.sendEmail(MailContent.of(standByUser.getEmail(), title, msg)));
     }
 }

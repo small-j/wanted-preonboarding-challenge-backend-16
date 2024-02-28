@@ -4,7 +4,6 @@ import com.wanted.preonboarding.ticket.domain.dto.*;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
 import com.wanted.preonboarding.ticket.domain.entity.Reservation;
-import com.wanted.preonboarding.ticket.domain.entity.StandByUser;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceSeatInfoRepository;
 import com.wanted.preonboarding.ticket.infrastructure.repository.ReservationRepository;
@@ -273,5 +272,55 @@ public class TicketSellerTest {
 
         // then
         Assertions.assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void sendEmailWhenCanceledReservation() {
+        // given
+        Performance performance = Performance.builder()
+                .name("레베카")
+                .price(10000)
+                .round(1)
+                .type(0)
+                .isReserve("enable")
+                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
+                .build();
+        PerformanceSeatInfo performanceSeatInfo = PerformanceSeatInfo.builder()
+                .performance(performance)
+                .round(1)
+                .gate(1)
+                .line('A')
+                .seat(1)
+                .isReserve("enable")
+                .build();
+        performanceRepository.save(performance);
+        performanceSeatInfoRepository.save(performanceSeatInfo);
+
+        ReservationResult result = ticketSeller.reserve(ReserveInfo.builder()
+                .performanceId(performance.getId())
+                .reservationName("유진호")
+                .reservationPhoneNumber("010-1234-1234")
+                .reservationStatus("reserve")
+                .amount(200000)
+                .round(1)
+                .line('A')
+                .seat(1)
+                .build()
+        );
+
+        StandByUserInfo standByUserInfo = StandByUserInfo.builder()
+                .performanceId(performance.getId())
+                .name("김지윤")
+                .phoneNumber("010-1234-1234")
+                .email("wldbs2043@naver.com")
+                .build();
+        ticketSeller.addStandByUser(standByUserInfo);
+
+
+        // when
+        ticketSeller.cancelReservation(result.getReservationId());
+
+        // then
+        // smallj : 출력한 결과를 바탕으로 테스트를 할 수 있는 방법이 없을까?
     }
 }
