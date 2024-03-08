@@ -1,6 +1,8 @@
 package com.wanted.preonboarding.ticket.application;
 
 import com.wanted.preonboarding.ticket.discountPolicy.DiscountPolicy;
+import com.wanted.preonboarding.ticket.domain.ReservationStatus;
+import com.wanted.preonboarding.ticket.domain.PerformanceSeatReserveStatus;
 import com.wanted.preonboarding.ticket.domain.dto.*;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
@@ -31,20 +33,6 @@ public class TicketSeller {
     private final DiscountPolicy discountPolicy;
     private final EmailSender emailSender;
 
-    private final String isEnable = "enable";
-    private final String isDisable = "disable";
-
-    public List<PerformanceInfo> getAllPerformanceInfoList() {
-        return performanceRepository.findByIsReserve(isEnable)
-            .stream()
-            .map(PerformanceInfo::of)
-            .toList();
-    }
-
-    public PerformanceInfo getPerformanceInfoDetail(String id) {
-        return PerformanceInfo.of(performanceRepository.findById(UUID.fromString(id))
-                .orElseThrow(EntityNotFoundException::new));
-    }
 
     @Transactional
     public ReservationResult reserve(ReserveInfo reserveInfo) {
@@ -52,12 +40,12 @@ public class TicketSeller {
                 .orElseThrow(EntityNotFoundException::new);
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reserveInfo.getRound(), reserveInfo.getLine(), reserveInfo.getSeat());
 
-        isEnabled(performance, performanceSeatInfo);
+        performanceSeatInfo.isEnabled(performance);
 
         pay(reserveInfo, getDiscountedPrice(performance.getPrice()));
 
         Reservation reservation = reservationRepository.save(Reservation.of(reserveInfo));
-        performanceSeatInfo.setIsReserve(isDisable);
+        performanceSeatInfo.setIsReserve(PerformanceSeatReserveStatus.disable);
 
         return ReservationResult.of(performance, reservation);
     }
@@ -85,14 +73,14 @@ public class TicketSeller {
     public void cancelReservation(int reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(IllegalArgumentException::new);
-        reservation.setIsCanceled(isEnable);
+        reservation.setIsCanceled(ReservationStatus.canceled);
 
         // smallj : 좌석 정보 업데이트 필요. -> 좌석 정보 업데이트를 위해 매번 공연을 조회해야하나?
         Performance performance = performanceRepository.findById(reservation.getPerformanceId())
                 .orElseThrow(IllegalArgumentException::new);
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reservation.getRound(), reservation.getLine(), reservation.getSeat());
 
-        performanceSeatInfo.setIsReserve(isEnable);
+        performanceSeatInfo.setIsReserve(PerformanceSeatReserveStatus.enable);
 
         sendEmailToStandByUser(reservation);
     }
@@ -104,15 +92,6 @@ public class TicketSeller {
         standByUserRepository.save(standByUser);
         // smallj : 이미 신청한 공연 대기라면 예외 처리 구현 필요.
         return StandByUserInfo.of(standByUser);
-    }
-
-    private void isEnabled(Performance performance, PerformanceSeatInfo performanceSeatInfo) {
-        String result = performance.getIsReserve().equalsIgnoreCase(isEnable)
-                && performanceSeatInfo.getIsReserve().equalsIgnoreCase(isEnable) ? isEnable : isDisable;
-
-        String disableReservationMessage = "예약할 수 없는 공연(공연좌석) 입니다.";
-        if (result.equalsIgnoreCase(isDisable))
-            throw new IllegalArgumentException(disableReservationMessage);
     }
 
     private long getDiscountedPrice(long price) {

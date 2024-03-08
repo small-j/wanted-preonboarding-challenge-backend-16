@@ -1,5 +1,7 @@
 package com.wanted.preonboarding.ticket.application;
 
+import com.wanted.preonboarding.ticket.domain.PerformanceSeatReserveStatus;
+import com.wanted.preonboarding.ticket.domain.ReservationStatus;
 import com.wanted.preonboarding.ticket.domain.dto.*;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.domain.entity.PerformanceSeatInfo;
@@ -13,13 +15,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest
-@RunWith(SpringRunner.class)
+@Transactional
 public class TicketSellerTest {
     @Autowired
     private PerformanceRepository performanceRepository;
@@ -31,48 +34,6 @@ public class TicketSellerTest {
     @Autowired
     private TicketSeller ticketSeller;
 
-    @Test
-    public void getAllPerformanceInfoList() {
-        // given
-        Performance performance1 = Performance.builder()
-                .name("레베카")
-                .price(100000)
-                .round(1)
-                .type(0)
-                .isReserve("enable")
-                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
-                .build();
-        Performance performance2 = Performance.builder()
-                .name("캣츠")
-                .price(100000)
-                .round(1)
-                .type(0)
-                .isReserve("enable")
-                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
-                .build();
-        Performance performance3 = Performance.builder()
-                .name("레미제라블")
-                .price(100000)
-                .round(1)
-                .type(0)
-                .isReserve("disable")
-                .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
-                .build();
-        Performance savedPerformance1 = performanceRepository.save(performance1);
-        Performance savedPerformance2 = performanceRepository.save(performance2);
-        Performance savedPerformance3 = performanceRepository.save(performance3);
-
-        // when
-        List<PerformanceInfo> performanceInfoList = ticketSeller.getAllPerformanceInfoList();
-        List<UUID> performanceIdList = performanceInfoList
-                .stream()
-                .map(performanceInfo -> performanceInfo.getPerformanceId())
-                .toList();
-
-        // then
-        Assertions.assertThat(performanceIdList).contains(savedPerformance1.getId());
-        Assertions.assertThat(performanceIdList).isNotIn(savedPerformance3.getId());
-    }
 
     @Test
     public void reserve() {
@@ -82,7 +43,7 @@ public class TicketSellerTest {
                 .price(10000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
         Performance savedPerformance = performanceRepository.save(performance);
@@ -92,7 +53,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(1)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
 
         PerformanceSeatInfo performanceSeatInfo2 = PerformanceSeatInfo.builder()
@@ -101,7 +62,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(2)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
 
         PerformanceSeatInfo performanceSeatInfo3 = PerformanceSeatInfo.builder()
@@ -110,7 +71,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(3)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
         performanceSeatInfoRepository.save(performanceSeatInfo1);
         performanceSeatInfoRepository.save(performanceSeatInfo2);
@@ -142,7 +103,7 @@ public class TicketSellerTest {
                 .price(10000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
         performanceRepository.save(performance1);
@@ -151,7 +112,7 @@ public class TicketSellerTest {
                 .price(100000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
         performanceRepository.save(performance2);
@@ -162,7 +123,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(1)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
         performanceSeatInfoRepository.save(performanceSeatInfo1);
         PerformanceSeatInfo performanceSeatInfo2 = PerformanceSeatInfo.builder()
@@ -171,7 +132,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(1)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
         performanceSeatInfoRepository.save(performanceSeatInfo2);
 
@@ -213,7 +174,7 @@ public class TicketSellerTest {
                 .price(10000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
         PerformanceSeatInfo performanceSeatInfo = PerformanceSeatInfo.builder()
@@ -222,7 +183,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(1)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
         performanceRepository.save(performance);
         performanceSeatInfoRepository.save(performanceSeatInfo);
@@ -245,7 +206,7 @@ public class TicketSellerTest {
         // then
         Reservation reservation = reservationRepository.findById(result.getReservationId())
                 .orElseThrow(IllegalArgumentException::new);
-        Assertions.assertThat(reservation.getIsCanceled()).isEqualTo("enable");
+        Assertions.assertThat(reservation.getIsCanceled()).isEqualTo(ReservationStatus.canceled);
     }
 
     @Test
@@ -256,7 +217,7 @@ public class TicketSellerTest {
                 .price(10000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
         performanceRepository.save(performance);
@@ -282,7 +243,7 @@ public class TicketSellerTest {
                 .price(10000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
         PerformanceSeatInfo performanceSeatInfo = PerformanceSeatInfo.builder()
@@ -291,7 +252,7 @@ public class TicketSellerTest {
                 .gate(1)
                 .line('A')
                 .seat(1)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .build();
         performanceRepository.save(performance);
         performanceSeatInfoRepository.save(performanceSeatInfo);
@@ -321,6 +282,6 @@ public class TicketSellerTest {
         ticketSeller.cancelReservation(result.getReservationId());
 
         // then
-        // smallj : 출력한 결과를 바탕으로 테스트를 할 수 있는 방법이 없을까?
+        // smallj: 이메일이 제대로 전달되었음을 알 수 있는 방법이 없을까?
     }
 }

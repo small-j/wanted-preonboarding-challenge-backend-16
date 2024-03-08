@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.ticket.domain.dto;
 
+import com.wanted.preonboarding.ticket.domain.PerformanceSeatReserveStatus;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class PerformanceInfo {
     private String performanceName;
     private String performanceType;
     private LocalDateTime startDate;
-    private String isReserve;
+    private PerformanceSeatReserveStatus isReserve;
 
     public static PerformanceInfo of(Performance entity) {
         return PerformanceInfo.builder()

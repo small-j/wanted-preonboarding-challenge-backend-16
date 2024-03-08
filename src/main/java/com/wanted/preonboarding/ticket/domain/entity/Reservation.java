@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.ticket.domain.entity;
 
+import com.wanted.preonboarding.ticket.domain.ReservationStatus;
 import com.wanted.preonboarding.ticket.domain.dto.ReserveInfo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,8 @@ public class Reservation {
     private char line;
     private int seat;
     @Column(nullable = false, columnDefinition = "varchar default 'disable'")
-    private String isCanceled;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus isCanceled;
 
     public static Reservation of(ReserveInfo info) {
         return Reservation.builder()
@@ -46,11 +48,11 @@ public class Reservation {
             .gate(1)
             .line(info.getLine())
             .seat(info.getSeat())
-            .isCanceled("disabled")
+            .isCanceled(ReservationStatus.alive)
             .build();
     }
 
-    public void setIsCanceled(String isCanceled) {
+    public void setIsCanceled(ReservationStatus isCanceled) {
         this.isCanceled = isCanceled;
     }
 }

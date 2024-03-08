@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.ticket.domain.dto;
 
+import com.wanted.preonboarding.ticket.domain.PerformanceSeatReserveStatus;
 import com.wanted.preonboarding.ticket.domain.entity.Performance;
 import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,7 +39,7 @@ public class PerformanceTests {
                 .price(100000)
                 .round(1)
                 .type(0)
-                .isReserve("enable")
+                .isReserve(PerformanceSeatReserveStatus.enable)
                 .startDate(LocalDateTime.of(2024, 1, 14, 10, 34))
                 .build();
 

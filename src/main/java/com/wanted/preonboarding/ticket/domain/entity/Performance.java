@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.ticket.domain.entity;
 
+import com.wanted.preonboarding.ticket.domain.PerformanceSeatReserveStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,5 +34,6 @@ public class Performance {
     @Column(nullable = false)
     private LocalDateTime startDate;
     @Column(nullable = false, name = "is_reserve", columnDefinition = "varchar default 'enable'")
-    private String isReserve;
+    @Enumerated(EnumType.STRING)
+    private PerformanceSeatReserveStatus isReserve;
 }
