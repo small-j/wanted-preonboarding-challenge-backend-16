@@ -11,15 +11,12 @@ import com.wanted.preonboarding.ticket.infrastructure.repository.PerformanceSeat
 import com.wanted.preonboarding.ticket.infrastructure.repository.ReservationRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @SpringBootTest
 @Transactional
@@ -96,7 +93,6 @@ public class TicketSellerTest {
 
     @Test
     public void findReservationHistory() {
-        // smallj : 깨지기 쉬운 test. 매번 데이터 베이스 데이터를 초기화 해 줄 방법을 찾아보자.
         // given
         Performance performance1 = Performance.builder()
                 .name("레베카")
