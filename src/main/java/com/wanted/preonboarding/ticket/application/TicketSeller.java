@@ -72,12 +72,12 @@ public class TicketSeller {
     @Transactional
     public void cancelReservation(int reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
         reservation.setIsCanceled(ReservationStatus.canceled);
 
         // smallj : 좌석 정보 업데이트 필요. -> 좌석 정보 업데이트를 위해 매번 공연을 조회해야하나?
         Performance performance = performanceRepository.findById(reservation.getPerformanceId())
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 공연입니다."));
         PerformanceSeatInfo performanceSeatInfo = performanceSeatInfoRepository.findPerformanceSeatInfo(performance, reservation.getRound(), reservation.getLine(), reservation.getSeat());
 
         performanceSeatInfo.setIsReserve(PerformanceSeatReserveStatus.enable);
@@ -99,6 +99,8 @@ public class TicketSeller {
     }
 
     private void pay(ReserveInfo reserveInfo, long price) {
+        // smallj : 원래라면 통장 entity 같은 곳에서 처리해야할 로직이지만
+        // 이 프로젝트에서는 잔고를 단순히 DTO에만 저장하고 있기 때문에 아래처럼 간단히만 처리.
         String amountNotEnoughMessage = "통장 잔고 부족으로 결제를 수행할 수 있는 상태가 아닙니다.";
         if (!isAmountEnough(reserveInfo.getAmount(), price))
             throw new IllegalStateException(amountNotEnoughMessage);
@@ -112,7 +114,7 @@ public class TicketSeller {
 
     private void sendEmailToStandByUser(Reservation reservation) {
         Performance performance = performanceRepository.findById(reservation.getPerformanceId())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 공연입니다."));
 
         String title = "공연 예약 알림";
         String msg = performance.getName() + " 공연이 예약 가능합니다.";

@@ -27,7 +27,7 @@ public class PerformanceMaintainer {
 
     public PerformanceInfo getPerformanceInfoDetail(String id) {
         return PerformanceInfo.of(performanceRepository.findById(UUID.fromString(id))
-                .orElseThrow(EntityNotFoundException::new));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 공연입니다.")));
     }
 
 }
